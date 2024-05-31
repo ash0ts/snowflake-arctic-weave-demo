@@ -49,11 +49,9 @@ python -m src.llm_types.agent.agent # For Running the ReAct Agent (Evaluation WI
 Ensure to set the `.streamlit/secrets.toml` file with the appropriate API Key and reference to a Weave Model. The file should look like this:
 
 ```toml
-[
-    REPLICATE_API_TOKEN = "<your_replicate_api_token>"
-    ANY_OTHER_NECCESARY_LLM_API_KEY_FOR_LITELLM = "<your_llm_api_key>"
-    WEAVE_MODEL_REF = "<your_weave_model_ref>"
-]
+REPLICATE_API_TOKEN = "<your_replicate_api_token>"
+ANY_OTHER_NECCESARY_LLM_API_KEY_FOR_LITELLM = "<your_llm_api_key>"
+WEAVE_MODEL_REF = "<your_weave_model_ref>"
 ```
 
 Start the Streamlit application to interact with a selected model after running one of the above commands. 
