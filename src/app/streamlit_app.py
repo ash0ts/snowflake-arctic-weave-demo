@@ -215,10 +215,11 @@ def get_and_process_prompt():
             # TODO: remove next when streaming
             response = next(generate_arctic_response())
             st.markdown(f"{response['answer']}")
-            st.markdown(
-                context_callout.format(context=response["context"]),
-                unsafe_allow_html=True,
-            )
+            if "context" in response:
+                st.markdown(
+                    context_callout.format(context=response["context"]),
+                    unsafe_allow_html=True,
+                )
 
     if st.session_state.chat_aborted:
         st.button("Reset chat", on_click=clear_chat_history,
@@ -253,7 +254,8 @@ def communicate_with_arctic(prompt_str):
     model = load_model()
     response = model.predict(prompt_str)
     st.session_state.messages[-1]["content"] = response["answer"]
-    st.session_state.messages[-1]["context"] = response["context"]
+    if "context" in response:
+        st.session_state.messages[-1]["context"] = response["context"]
     yield response
 
 

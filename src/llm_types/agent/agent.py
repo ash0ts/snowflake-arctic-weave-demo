@@ -120,7 +120,7 @@ class LLMAgentModel(Model):
         }
 
     @weave.op()
-    def predict(self, question: str, multiturn: bool = True) -> str:
+    def predict(self, question: str, multithought: bool = True) -> str:
         tool_names = ", ".join(
             [
                 tool.__name__ if hasattr(tool, "__name__") else str(tool)
@@ -137,7 +137,7 @@ class LLMAgentModel(Model):
 
         tools = [tool_registry.tools[tool]["dict"]
                  for tool in tool_registry.tools]
-        if multiturn:
+        if multithought:
             response = self.react_prompting(prompt, tools)[
                 "messages"][-1]["content"]
         else:
