@@ -65,12 +65,9 @@ class RAGModel(Model):
             "model": self.model_name,
             "messages": messages,
             "temperature": self.temperature,
-            # "response_format": {"type": "text"},
         }
         if "gpt" not in self.model_name:
             completion_args["system"] = messages.pop(0)["content"]
-        if "claude" in self.model_name:
-            del completion_args["response_format"]
         response = completion(**completion_args)
         answer = response.choices[0].message.content
         return {"answer": answer, "context": context}
