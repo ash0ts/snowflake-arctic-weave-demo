@@ -1,7 +1,8 @@
-from sentence_transformers import SentenceTransformer
-from typing import List, Dict, Union, Optional
-import weave
 from dataclasses import dataclass
+from typing import Dict, List, Optional, Union
+
+import weave
+from sentence_transformers import SentenceTransformer
 
 
 class SentenceTransformersModel(weave.Model):
@@ -14,9 +15,7 @@ class SentenceTransformersModel(weave.Model):
         self,
         model_name: Optional[str] = "sentence-transformers/all-MiniLM-L6-v2",
     ):
-        super().__init__(
-            model_name=model_name
-        )
+        super().__init__(model_name=model_name)
         self.model_name = model_name
         self.model_type = "sentence_transformers"
         # Initialize the Sentence Transformer model
@@ -53,12 +52,15 @@ class SentenceTransformersModel(weave.Model):
         return embedding_data
 
     @weave.op()
-    def litellm_compatible_embedding(self, input: Union[List[str], str], model: Optional[str] = None) -> List[float]:
+    def litellm_compatible_embedding(
+        self, input: Union[List[str], str], model: Optional[str] = None
+    ) -> List[float]:
 
         @dataclass
         class LitellmCompatibleEmbedding:
             data: List[Dict[str, List[float]]]
 
         compatible_embedding = LitellmCompatibleEmbedding(
-            data=self.predict([input] if isinstance(input, str) else input))
+            data=self.predict([input] if isinstance(input, str) else input)
+        )
         return compatible_embedding

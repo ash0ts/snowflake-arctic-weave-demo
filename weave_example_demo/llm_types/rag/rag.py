@@ -7,7 +7,11 @@ from dotenv import load_dotenv
 from litellm import completion
 from weave import Model
 
-from weave_example_demo.llm_types.prompts import PromptTemplate, rag_human_prompts, rag_system_prompts
+from weave_example_demo.llm_types.prompts import (
+    PromptTemplate,
+    rag_human_prompts,
+    rag_system_prompts,
+)
 from weave_example_demo.llm_types.rag.vector_store import VectorStore
 from weave_example_demo.scorers.llm_guard_scorer import LLMGuardScorer
 from weave_example_demo.scorers.tonic_validate_scorer import TonicValidateScorer
@@ -64,13 +68,15 @@ class RAGModel(Model):
     ):  # note: `question` will be used later to select data from our evaluation rows
 
         _context = self.vector_store.get_most_relevant_documents(
-            query=question, n=n_documents)
+            query=question, n=n_documents
+        )
 
         # TODO: remove hard coding or parameterize
-        context_documents = [doc["document"]["passage"]
-                             for doc in _context]
+        context_documents = [doc["document"]["passage"] for doc in _context]
         context = "\n\n".join(
-            [f"Context {i+1}:\n{doc}" for i, doc in enumerate(context_documents)])
+            [f"Context {i+1}:\n{doc}" for i,
+                doc in enumerate(context_documents)]
+        )
 
         human_prompt_args = {
             "question": question,

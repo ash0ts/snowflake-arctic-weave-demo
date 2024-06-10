@@ -1,9 +1,7 @@
 import time
-from dataclasses import asdict
 from pathlib import Path
 
 import pandas as pd
-import wandb
 from langchain.document_loaders import YoutubeLoader
 from pytube import Playlist, YouTube
 from tqdm import tqdm
