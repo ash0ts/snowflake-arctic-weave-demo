@@ -1,16 +1,16 @@
 import asyncio
 from itertools import product
-from typing import Optional
+from typing import Optional, Union
 
 import weave
 from dotenv import load_dotenv
 from litellm import completion
 from weave import Model
 
-from src.llm_types.prompts import PromptTemplate, rag_human_prompts, rag_system_prompts
-from src.llm_types.rag.vector_store import VectorStore
-from src.scorers.llm_guard_scorer import LLMGuardScorer
-from src.scorers.tonic_validate_scorer import TonicValidateScorer
+from weave_example_demo.llm_types.prompts import PromptTemplate, rag_human_prompts, rag_system_prompts
+from weave_example_demo.llm_types.rag.vector_store import VectorStore
+from weave_example_demo.scorers.llm_guard_scorer import LLMGuardScorer
+from weave_example_demo.scorers.tonic_validate_scorer import TonicValidateScorer
 
 # Load environment variables from a .env file
 load_dotenv()
@@ -21,11 +21,12 @@ class RAGModel(Model):
     model_name: str = "gpt-3.5-turbo-1106"
     prompt_template: PromptTemplate
     temperature: float = 0.0
-    vector_store: VectorStore
+    vector_store: Optional[Union[VectorStore, str]] = None
+    name: str = "RAGModel"
 
     def __init__(
         self,
-        vector_store: VectorStore,
+        # vector_store: Union[VectorStore, str],
         system_prompt: Optional[str],
         human_prompt: Optional[str],
         model_name: str = "gpt-3.5-turbo",
@@ -37,23 +38,40 @@ class RAGModel(Model):
                 system_prompt=system_prompt, human_prompt=human_prompt
             ),
             temperature=temperature,
-            vector_store=vector_store,
+            # vector_store=vector_store,
         )
         self.model_name = model_name
         self.prompt_template = PromptTemplate(
             system_prompt=system_prompt, human_prompt=human_prompt
         )
         self.temperature = temperature
-        self.vector_store = vector_store
+        # TODO: set vector store
+        # self.set_vector_store(vector_store)
+
+    @weave.op()
+    def set_vector_store(self, vector_store: Union[VectorStore, str]):
+        if isinstance(vector_store, str) and vector_store.startswith("weave://"):
+            vector_store_ref = weave.ref(vector_store)
+            self.vector_store = vector_store_ref.get()
+        else:
+            self.vector_store = vector_store
 
     @weave.op()
     def predict(
-        self, question: str
+        self, question: str, n_documents: int = 2
     ) -> (
         dict
     ):  # note: `question` will be used later to select data from our evaluation rows
 
-        context = self.vector_store.get_most_relevant_document(question)
+        _context = self.vector_store.get_most_relevant_documents(
+            query=question, n=n_documents)
+
+        # TODO: remove hard coding or parameterize
+        context_documents = [doc["document"]["passage"]
+                             for doc in _context]
+        context = "\n\n".join(
+            [f"Context {i+1}:\n{doc}" for i, doc in enumerate(context_documents)])
+
         human_prompt_args = {
             "question": question,
             "context": context,
@@ -70,7 +88,7 @@ class RAGModel(Model):
             completion_args["system"] = messages.pop(0)["content"]
         response = completion(**completion_args)
         answer = response.choices[0].message.content
-        return {"answer": answer, "context": context}
+        return {"answer": answer, "context": _context}
 
 
 def main():

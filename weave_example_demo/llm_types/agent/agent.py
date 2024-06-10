@@ -6,16 +6,16 @@ from dotenv import load_dotenv
 from litellm import completion
 from weave import Model
 
-from src.llm_types.agent.tools import RAGTool, tool_registry
-from src.llm_types.prompts import (
+from weave_example_demo.llm_types.agent.tools import RAGTool, tool_registry
+from weave_example_demo.llm_types.prompts import (
     PromptTemplate,
     agent_human_prompt_template,
     agent_system_prompt_template,
     rag_human_prompts,
     rag_system_prompts,
 )
-from src.llm_types.rag.rag import RAGModel
-from src.llm_types.rag.vector_store import VectorStore
+from weave_example_demo.llm_types.rag.rag import RAGModel
+from weave_example_demo.llm_types.rag.vector_store import VectorStore
 
 # Load environment variables from a .env file
 load_dotenv()
@@ -76,6 +76,8 @@ class LLMAgentModel(Model):
         )
         response_message = response.choices[0].message
         has_tool_calls = hasattr(response_message, "tool_calls")
+        print(response_message)
+        print(has_tool_calls)
 
         if has_tool_calls:
             tool_calls = response_message.tool_calls
