@@ -61,9 +61,6 @@ def calculate_tool(expression: str) -> str:
         return str(e)
 
 
-# TODO: Do not force default tools
-# Create the tool registry instance
-tool_registry = ToolRegistry()
 search_tool_kwargs = {
     "key": "search_tool",
     "function": search_tool,

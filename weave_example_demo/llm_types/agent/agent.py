@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from litellm import completion
 from weave import Model
 
-from weave_example_demo.llm_types.agent.tools import RAGTool, tool_registry
+from weave_example_demo.llm_types.agent.tools import RAGTool, ToolRegistry
 from weave_example_demo.llm_types.prompts import (
     PromptTemplate,
     agent_human_prompt_template,
@@ -25,6 +25,7 @@ class LLMAgentModel(Model):
 
     model_name: str
     tools: List[Callable]
+    agent_tool_registry: ToolRegistry
     prompt_template: PromptTemplate
     temperature: float
     max_tokens: int
@@ -34,13 +35,16 @@ class LLMAgentModel(Model):
         model_name: str,
         system_prompt: str,
         human_prompt: str,
-        tools: List[str],
+        allowed_tools: List[str],
+        agent_tool_registry: ToolRegistry,
         temperature: float = 0.0,
         max_tokens: int = 1000,
     ):
         super().__init__(
             model_name=model_name,
-            tools=[tool_registry.tools[tool]["function"] for tool in tools],
+            tools=[agent_tool_registry.tools[tool]["function"]
+                   for tool in allowed_tools],
+            agent_tool_registry=agent_tool_registry,
             prompt_template=PromptTemplate(
                 system_prompt=system_prompt, human_prompt=human_prompt
             ),
@@ -48,7 +52,9 @@ class LLMAgentModel(Model):
             max_tokens=max_tokens,
         )
         self.model_name = model_name
-        self.tools = [tool_registry.tools[tool]["function"] for tool in tools]
+        self.tools = [self.agent_tool_registry.tools[tool]["function"]
+                      for tool in allowed_tools]
+        self.agent_tool_registry = agent_tool_registry
         self.prompt_template = PromptTemplate(
             system_prompt=system_prompt, human_prompt=human_prompt
         )
@@ -57,8 +63,8 @@ class LLMAgentModel(Model):
 
     @weave.op()
     def call_tool(self, tool_name: str, *args, **kwargs):
-        if tool_name in tool_registry.tools:
-            tool = tool_registry.tools[tool_name]["function"]
+        if tool_name in self.agent_tool_registry.tools:
+            tool = self.agent_tool_registry.tools[tool_name]["function"]
             return tool(*args, **kwargs)
         raise ValueError(f"Tool <{tool_name}> not found")
 
@@ -137,8 +143,8 @@ class LLMAgentModel(Model):
             system_prompt_args=system_prompt_args, human_prompt_args=human_prompt_args
         )
 
-        tools = [tool_registry.tools[tool]["dict"]
-                 for tool in tool_registry.tools]
+        tools = [self.agent_tool_registry.tools[tool]["dict"]
+                 for tool in self.agent_tool_registry.tools]
         if multithought:
             response = self.react_prompting(prompt, tools)[
                 "messages"][-1]["content"]

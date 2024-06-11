@@ -30,9 +30,9 @@ class RAGModel(Model):
 
     def __init__(
         self,
-        # vector_store: Union[VectorStore, str],
-        system_prompt: Optional[str],
-        human_prompt: Optional[str],
+        vector_store: Union[VectorStore, str],
+        system_prompt: Optional[str] = None,
+        human_prompt: Optional[str] = None,
         model_name: str = "gpt-3.5-turbo",
         temperature: float = 0.0,
     ):
@@ -49,8 +49,7 @@ class RAGModel(Model):
             system_prompt=system_prompt, human_prompt=human_prompt
         )
         self.temperature = temperature
-        # TODO: set vector store
-        # self.set_vector_store(vector_store)
+        self.set_vector_store(vector_store)
 
     @weave.op()
     def set_vector_store(self, vector_store: Union[VectorStore, str]):
@@ -63,15 +62,12 @@ class RAGModel(Model):
     @weave.op()
     def predict(
         self, question: str, n_documents: int = 2
-    ) -> (
-        dict
-    ):  # note: `question` will be used later to select data from our evaluation rows
-
+    ) -> dict:
+        self.set_vector_store(self.vector_store)
         _context = self.vector_store.get_most_relevant_documents(
             query=question, n=n_documents
         )
 
-        # TODO: remove hard coding or parameterize
         context_documents = [doc["document"]["passage"] for doc in _context]
         context = "\n\n".join(
             [f"Context {i+1}:\n{doc}" for i,
@@ -94,7 +90,15 @@ class RAGModel(Model):
             completion_args["system"] = messages.pop(0)["content"]
         response = completion(**completion_args)
         answer = response.choices[0].message.content
-        return {"answer": answer, "context": _context}
+
+        return self.post_process_result(answer, _context)
+
+    def post_process_result(self, answer: str, context: list) -> dict:
+        """
+        Post-process the answer and context.
+        Subclasses can override this method to perform custom post-processing.
+        """
+        return {"answer": answer, "context": context}
 
 
 def main():
