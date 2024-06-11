@@ -60,9 +60,7 @@ class RAGModel(Model):
             self.vector_store = vector_store
 
     @weave.op()
-    def predict(
-        self, question: str, n_documents: int = 2
-    ) -> dict:
+    def predict(self, question: str, n_documents: int = 2) -> dict:
         self.set_vector_store(self.vector_store)
         _context = self.vector_store.get_most_relevant_documents(
             query=question, n=n_documents

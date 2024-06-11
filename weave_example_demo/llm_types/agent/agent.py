@@ -42,8 +42,9 @@ class LLMAgentModel(Model):
     ):
         super().__init__(
             model_name=model_name,
-            tools=[agent_tool_registry.tools[tool]["function"]
-                   for tool in allowed_tools],
+            tools=[
+                agent_tool_registry.tools[tool]["function"] for tool in allowed_tools
+            ],
             agent_tool_registry=agent_tool_registry,
             prompt_template=PromptTemplate(
                 system_prompt=system_prompt, human_prompt=human_prompt
@@ -52,8 +53,9 @@ class LLMAgentModel(Model):
             max_tokens=max_tokens,
         )
         self.model_name = model_name
-        self.tools = [self.agent_tool_registry.tools[tool]["function"]
-                      for tool in allowed_tools]
+        self.tools = [
+            self.agent_tool_registry.tools[tool]["function"] for tool in allowed_tools
+        ]
         self.agent_tool_registry = agent_tool_registry
         self.prompt_template = PromptTemplate(
             system_prompt=system_prompt, human_prompt=human_prompt
@@ -143,8 +145,10 @@ class LLMAgentModel(Model):
             system_prompt_args=system_prompt_args, human_prompt_args=human_prompt_args
         )
 
-        tools = [self.agent_tool_registry.tools[tool]["dict"]
-                 for tool in self.agent_tool_registry.tools]
+        tools = [
+            self.agent_tool_registry.tools[tool]["dict"]
+            for tool in self.agent_tool_registry.tools
+        ]
         if multithought:
             response = self.react_prompting(prompt, tools)[
                 "messages"][-1]["content"]

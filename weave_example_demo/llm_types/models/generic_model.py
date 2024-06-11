@@ -1,11 +1,7 @@
-import asyncio
-from itertools import product
-from typing import Optional, Union
+from typing import Optional
 
 import weave
-from dotenv import load_dotenv
 from litellm import completion
-from weave import Model
 
 from weave_example_demo.llm_types.prompts import PromptTemplate
 
@@ -41,12 +37,9 @@ class GenericLLMModel(weave.Model):
         self,
         human_prompt_args: Optional[dict] = {},
         system_prompt_args: Optional[dict] = {},
-    ) -> (
-        dict
-    ):
+    ) -> dict:
         messages = self.prompt_template.format_prompt(
-            human_prompt_args=human_prompt_args,
-            system_prompt_args=system_prompt_args
+            human_prompt_args=human_prompt_args, system_prompt_args=system_prompt_args
         )
         completion_args = {
             "model": self.model_name,
