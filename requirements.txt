@@ -230,7 +230,7 @@ watchfiles==0.22.0
 wcwidth==0.2.13
 weasel==0.3.4
 weave==0.50.3
--e git+https://github.com/ash0ts/snowflake-arctic-weave-demo.git@ff51f81382a7e12c2f8b5816b49f935f736aea26#egg=weave_example_demo
+-e git+https://github.com/ash0ts/snowflake-arctic-weave-demo.git@1b71e7b1c95b39718e63be65ebf279a8a534a2a3#egg=weave_example_demo
 websockets==12.0
 Werkzeug==3.0.3
 wrapt==1.16.0
