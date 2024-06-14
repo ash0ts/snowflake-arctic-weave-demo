@@ -1,5 +1,3 @@
-import asyncio
-from itertools import product
 from typing import Optional, Union
 
 import weave
@@ -9,12 +7,8 @@ from weave import Model
 
 from weave_example_demo.llm_types.prompts import (
     PromptTemplate,
-    rag_human_prompts,
-    rag_system_prompts,
 )
 from weave_example_demo.llm_types.rag.vector_store import VectorStore
-from weave_example_demo.scorers.llm_guard_scorer import LLMGuardScorer
-from weave_example_demo.scorers.tonic_validate_scorer import TonicValidateScorer
 
 # Load environment variables from a .env file
 load_dotenv()

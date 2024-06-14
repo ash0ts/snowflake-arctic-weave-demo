@@ -6,16 +6,12 @@ from dotenv import load_dotenv
 from litellm import completion
 from weave import Model
 
-from weave_example_demo.llm_types.agent.tools import RAGTool, ToolRegistry, search_tool, calculate_tool, search_tool_kwargs, calculate_tool_kwargs
+from weave_example_demo.llm_types.agent.tools import (
+    ToolRegistry,
+)
 from weave_example_demo.llm_types.prompts import (
     PromptTemplate,
-    agent_human_prompt_template,
-    agent_system_prompt_template,
-    rag_human_prompts,
-    rag_system_prompts,
 )
-from weave_example_demo.llm_types.rag.rag import RAGModel
-from weave_example_demo.llm_types.rag.vector_store import VectorStore
 
 # Load environment variables from a .env file
 load_dotenv()

@@ -1,12 +1,21 @@
+
 import weave
-from weave_example_demo.llm_types.rag.vector_store import VectorStore
-from weave_example_demo.llm_types.rag.rag import RAGModel
-import asyncio
-from weave_example_demo.llm_types.prompts import agent_human_prompt_template, agent_system_prompt_template, rag_human_prompts, rag_system_prompts
-from weave_example_demo.llm_types.agent.agent import LLMAgentModel
-from weave_example_demo.llm_types.agent.tools import RAGTool, ToolRegistry, search_tool, calculate_tool, search_tool_kwargs, calculate_tool_kwargs
-from itertools import product
+
 from examples.rag_agent_quickstart.rag import ExampleRAGModel
+from weave_example_demo.llm_types.agent.agent import LLMAgentModel
+from weave_example_demo.llm_types.agent.tools import (
+    RAGTool,
+    ToolRegistry,
+    calculate_tool_kwargs,
+    search_tool_kwargs,
+)
+from weave_example_demo.llm_types.prompts import (
+    agent_human_prompt_template,
+    agent_system_prompt_template,
+    rag_human_prompts,
+    rag_system_prompts,
+)
+from weave_example_demo.llm_types.rag.vector_store import VectorStore
 
 
 def main():
@@ -53,11 +62,7 @@ def main():
         },
     )
 
-    allowed_tools = [
-        "search_tool",
-        "calculate_tool",
-        "RAGTool"
-    ]
+    allowed_tools = ["search_tool", "calculate_tool", "RAGTool"]
     agent = LLMAgentModel(
         model_name="gpt-3.5-turbo",
         allowed_tools=allowed_tools,

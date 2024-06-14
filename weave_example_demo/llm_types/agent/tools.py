@@ -1,10 +1,11 @@
+import math
 from typing import Any, Callable, Dict
 
 import weave
 from pydantic import BaseModel, Field
 
 from weave_example_demo.llm_types.rag.rag import RAGModel
-import math
+
 # Implement based on weave ref
 
 

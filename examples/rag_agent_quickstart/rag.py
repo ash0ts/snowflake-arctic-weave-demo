@@ -1,11 +1,13 @@
-import weave
-from weave_example_demo.llm_types.rag.vector_store import VectorStore
-from weave_example_demo.llm_types.rag.rag import RAGModel
 import asyncio
-from weave_example_demo.llm_types.prompts import rag_human_prompts, rag_system_prompts
-from weave_example_demo.scorers.tonic_validate_scorer import TonicValidateScorer
-from weave_example_demo.scorers.llm_guard_scorer import LLMGuardScorer
 from itertools import product
+
+import weave
+
+from weave_example_demo.llm_types.prompts import rag_human_prompts, rag_system_prompts
+from weave_example_demo.llm_types.rag.rag import RAGModel
+from weave_example_demo.llm_types.rag.vector_store import VectorStore
+from weave_example_demo.scorers.llm_guard_scorer import LLMGuardScorer
+from weave_example_demo.scorers.tonic_validate_scorer import TonicValidateScorer
 
 
 class ExampleRAGModel(RAGModel):
@@ -13,7 +15,11 @@ class ExampleRAGModel(RAGModel):
         return context
 
     def post_process_result(self, answer: str, context: list) -> dict:
-        return {"answer": answer, "context": [doc["document"] for doc in context], "all_context": context}
+        return {
+            "answer": answer,
+            "context": [doc["document"] for doc in context],
+            "all_context": context,
+        }
 
 
 def main():
