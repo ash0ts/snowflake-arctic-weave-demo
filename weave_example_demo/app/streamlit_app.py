@@ -1,10 +1,10 @@
 import os
+from pathlib import Path
 
 import replicate
 import streamlit as st
 import weave
 from transformers import AutoTokenizer
-from pathlib import Path
 
 # App title
 st.set_page_config(page_title="Weave + Arctic Demo")

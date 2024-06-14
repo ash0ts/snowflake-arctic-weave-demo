@@ -3,7 +3,9 @@ from typing import List, Optional
 import weave
 from dotenv import load_dotenv
 
-from src.scorers.third_party_metrics_scorer import ThirdPartyMetricsScorer
+from weave_example_demo.scorers.third_party_metrics_scorer import (
+    ThirdPartyMetricsScorer,
+)
 
 load_dotenv()
 

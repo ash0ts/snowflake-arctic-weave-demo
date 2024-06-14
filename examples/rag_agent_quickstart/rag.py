@@ -1,76 +1,25 @@
 import asyncio
 from itertools import product
-from typing import Optional
 
 import weave
-from dotenv import load_dotenv
-from litellm import completion
-from weave import Model
 
-from src.llm_types.prompts import PromptTemplate, rag_human_prompts, rag_system_prompts
-from src.llm_types.rag.vector_store import VectorStore
-from src.scorers.llm_guard_scorer import LLMGuardScorer
-from src.scorers.tonic_validate_scorer import TonicValidateScorer
-
-# Load environment variables from a .env file
-load_dotenv()
+from weave_example_demo.llm_types.prompts import rag_human_prompts, rag_system_prompts
+from weave_example_demo.llm_types.rag.rag import RAGModel
+from weave_example_demo.llm_types.rag.vector_store import VectorStore
+from weave_example_demo.scorers.llm_guard_scorer import LLMGuardScorer
+from weave_example_demo.scorers.tonic_validate_scorer import TonicValidateScorer
 
 
-# class RAGModel(BaseModel):
-class RAGModel(Model):
-    model_name: str = "gpt-3.5-turbo-1106"
-    prompt_template: PromptTemplate
-    temperature: float = 0.0
-    vector_store: VectorStore
+class ExampleRAGModel(RAGModel):
+    def pre_process_context(self, context: list) -> list:
+        return context
 
-    def __init__(
-        self,
-        vector_store: VectorStore,
-        system_prompt: Optional[str],
-        human_prompt: Optional[str],
-        model_name: str = "gpt-3.5-turbo",
-        temperature: float = 0.0,
-    ):
-        super().__init__(
-            model_name=model_name,
-            prompt_template=PromptTemplate(
-                system_prompt=system_prompt, human_prompt=human_prompt
-            ),
-            temperature=temperature,
-            vector_store=vector_store,
-        )
-        self.model_name = model_name
-        self.prompt_template = PromptTemplate(
-            system_prompt=system_prompt, human_prompt=human_prompt
-        )
-        self.temperature = temperature
-        self.vector_store = vector_store
-
-    @weave.op()
-    def predict(
-        self, question: str
-    ) -> (
-        dict
-    ):  # note: `question` will be used later to select data from our evaluation rows
-
-        context = self.vector_store.get_most_relevant_document(question)
-        human_prompt_args = {
-            "question": question,
-            "context": context,
+    def post_process_result(self, answer: str, context: list) -> dict:
+        return {
+            "answer": answer,
+            "context": [doc["document"] for doc in context],
+            "all_context": context,
         }
-        messages = self.prompt_template.format_prompt(
-            human_prompt_args=human_prompt_args
-        )
-        completion_args = {
-            "model": self.model_name,
-            "messages": messages,
-            "temperature": self.temperature,
-        }
-        if "gpt" not in self.model_name:
-            completion_args["system"] = messages.pop(0)["content"]
-        response = completion(**completion_args)
-        answer = response.choices[0].message.content
-        return {"answer": answer, "context": context}
 
 
 def main():
@@ -124,7 +73,7 @@ def main():
         # "replicate/snowflake/snowflake-arctic-instruct"
     ]:
         for system_prompt, human_prompt in prompt_combinations:
-            model = RAGModel(
+            model = ExampleRAGModel(
                 model_name=model_name,
                 system_prompt=system_prompt,
                 human_prompt=human_prompt,

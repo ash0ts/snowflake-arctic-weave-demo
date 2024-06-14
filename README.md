@@ -37,11 +37,10 @@ This project is a Streamlit application that integrates Weights & Biases Weave, 
 - You can adjust the scorers and metrics used in `src/llm_types/<type>/<type>.py`
 - You can adjust the models you try in `src/llm_types/<type>/<type>.py`
 
-When done making changes, you can run the following commands to evaluate the model:
+When done making changes, navigate to the examples folder and run the desired examples:
 
 ```sh
-python -m src.llm_types.rag.rag # For Evaluating a RAG model
-python -m src.llm_types.agent.agent # For Running the ReAct Agent (Evaluation WIP)
+python -m examples.rag_agent_quickstart.rag # For Evaluating a RAG model as an example
 ```
 
 ### Running the Application

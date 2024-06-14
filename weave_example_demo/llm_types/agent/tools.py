@@ -1,8 +1,10 @@
+import math
 from typing import Any, Callable, Dict
 
+import weave
 from pydantic import BaseModel, Field
 
-from src.llm_types.rag.rag import RAGModel
+from weave_example_demo.llm_types.rag.rag import RAGModel
 
 # Implement based on weave ref
 
@@ -14,8 +16,8 @@ class RAGTool(BaseModel):
         super().__init__(rag_model=rag_model)
         self.rag_model = rag_model
 
-    def __call__(self, prompt: str) -> str:
-        return self.rag_model.predict(prompt)
+    def __call__(self, question: str, n_documents: int = 2) -> str:
+        return self.rag_model.predict(question, n_documents)
 
     @property
     def __name__(self):
@@ -44,42 +46,40 @@ class ToolRegistry(BaseModel):
 # Define the tool functions
 
 
+@weave.op()
 def search_tool(query: str) -> str:
     return (
         f"Searching for {query}... Results found: [Example result 1, Example result 2]"
     )
 
 
+@weave.op()
 def calculate_tool(expression: str) -> str:
     try:
-        result = eval(expression)
+        # Use all functions from math module
+        result = eval(expression, {"__builtins__": None}, math.__dict__)
         return f"The result of {expression} is {result}"
     except Exception as e:
         return str(e)
 
 
-# Create the tool registry instance
-tool_registry = ToolRegistry()
-
-# Add tools to the registry
-tool_registry.add_tool(
-    key="search_tool",
-    function=search_tool,
-    description="Search for a query",
-    parameters={
+search_tool_kwargs = {
+    "key": "search_tool",
+    "function": search_tool,
+    "description": "Search for a query",
+    "parameters": {
         "type": "object",
         "properties": {
             "query": {"type": "string", "description": "The search query"},
         },
         "required": ["query"],
     },
-)
-
-tool_registry.add_tool(
-    key="calculate_tool",
-    function=calculate_tool,
-    description="Calculate the result of an expression",
-    parameters={
+}
+calculate_tool_kwargs = {
+    "key": "calculate_tool",
+    "function": calculate_tool,
+    "description": "Calculate the result of an expression",
+    "parameters": {
         "type": "object",
         "properties": {
             "expression": {
@@ -89,4 +89,4 @@ tool_registry.add_tool(
         },
         "required": ["expression"],
     },
-)
+}
