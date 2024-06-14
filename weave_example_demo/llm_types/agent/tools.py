@@ -4,7 +4,7 @@ import weave
 from pydantic import BaseModel, Field
 
 from weave_example_demo.llm_types.rag.rag import RAGModel
-
+import math
 # Implement based on weave ref
 
 
@@ -55,7 +55,8 @@ def search_tool(query: str) -> str:
 @weave.op()
 def calculate_tool(expression: str) -> str:
     try:
-        result = eval(expression)
+        # Use all functions from math module
+        result = eval(expression, {"__builtins__": None}, math.__dict__)
         return f"The result of {expression} is {result}"
     except Exception as e:
         return str(e)

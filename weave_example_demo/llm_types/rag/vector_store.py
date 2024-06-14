@@ -19,7 +19,7 @@ class VectorStore(weave.Object):
         "text-embedding-3-small"
     )
     embedding_function: Optional[Callable] = None
-    articles: Union[List[str], str] = []
+    articles: Union[List[str], List[dict], str] = []
     article_embeddings: Optional[List[dict]] = None
     key: Optional[str] = None
     multiprocess_embeddings: Optional[bool] = False
@@ -37,10 +37,10 @@ class VectorStore(weave.Object):
 
     def __init__(
         self,
+        articles: Union[List[str], List[dict], str],
         embedding_model: Optional[
             Union[str, SentenceTransformersModel]
         ] = "text-embedding-3-small",
-        articles: Union[List[str], str] = [],
         key: Optional[str] = None,
         multiprocess_embeddings: Optional[bool] = False,
         ranking_method: str = "cosine",
@@ -89,14 +89,16 @@ class VectorStore(weave.Object):
             Union[str, SentenceTransformersModel]
         ] = "text-embedding-3-small",
     ):
-        func_name = None
-        if embedding_model.model_type == "sentence_transformers":
+        name = None
+        model_type = getattr(embedding_model, "model_type", None)
+        if model_type == "sentence_transformers":
             self.embedding_function = embedding_model.litellm_compatible_embedding
-            func_name = "sentence_transformers"
+            name = "sentence_transformers"
         else:
             self.embedding_function = embedding
-            func_name = "litellm"
-        return {"embedding_function": func_name}
+            name = "litellm"
+
+        return {"embedding_function": name}
 
     def init_embedding_model(
         self,
@@ -105,12 +107,13 @@ class VectorStore(weave.Object):
         ] = "text-embedding-3-small",
     ):
         name = None
-        if embedding_model.model_type == "sentence_transformers":
+        if isinstance(embedding_model, SentenceTransformersModel):
             self.embedding_function = embedding_model.litellm_compatible_embedding
             name = "sentence_transformers"
         else:
             self.embedding_function = embedding
             name = "litellm"
+
         return {"embedding_function": name}
 
     def docs_to_embeddings(self, docs: Union[List[dict], List[str]]) -> List[dict]:
