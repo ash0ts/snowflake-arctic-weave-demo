@@ -23,7 +23,7 @@ class ExampleRAGModel(RAGModel):
 
 
 def main():
-    weave.init("rag-qa-evaluation-qs-experiments")
+    weave.init("test-rag-example")
     questions = [
         {
             "question": "What significant result was reported about Zealand Pharma's obesity trial?",
@@ -67,7 +67,7 @@ def main():
     prompt_combinations = list(product(rag_system_prompts, rag_human_prompts))
     for model_name in [
         "gpt-3.5-turbo",
-        # "claude-3-haiku-20240307",
+        "claude-3-haiku-20240307",
         # "gpt-4-turbo",
         # "claude-3-opus-20240229",
         # "replicate/snowflake/snowflake-arctic-instruct"

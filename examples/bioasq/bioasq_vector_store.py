@@ -6,6 +6,7 @@ from weave_example_demo.llm_types.models.embedding_model import (
     SentenceTransformersModel,
 )
 from weave_example_demo.llm_types.rag.vector_store import VectorStore
+from .config import weave_project
 
 
 def get_relevant_documents(vector_store, query, n, ranking_method=None):
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--project_name",
         type=str,
-        default="bioasq-rag-data",
+        default=weave_project,
         help="Name of the Weave project",
     )
     parser.add_argument(

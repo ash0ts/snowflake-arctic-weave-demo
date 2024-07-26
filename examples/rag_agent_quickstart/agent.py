@@ -19,7 +19,7 @@ from weave_example_demo.llm_types.rag.vector_store import VectorStore
 
 
 def main():
-    weave.init("agentic-rag-example")
+    weave.init("test-agent-example")
 
     # For Agentic RAG
     articles = [

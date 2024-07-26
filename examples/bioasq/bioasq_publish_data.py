@@ -7,18 +7,19 @@ import pandas as pd
 import weave
 from datasets import load_dataset
 from sklearn.model_selection import StratifiedShuffleSplit, train_test_split
+from .config import weave_project
 
-weave.init("bioasq-rag-data")
+weave.init(weave_project)
 
 
-@weave.op()
+# @weave.op()
 def load_data(dataset_name: str = "rag-datasets/rag-mini-bioasq"):
     qap = load_dataset(dataset_name, "question-answer-passages")["test"]
     tc = load_dataset(dataset_name, "text-corpus")["passages"]
     return qap, tc
 
 
-@weave.op()
+# @weave.op()
 def preprocess_data(qap, tc):
     qap_df = qap.to_pandas()
     qap_df["relevant_passage_ids"] = qap_df["relevant_passage_ids"].apply(
@@ -43,7 +44,7 @@ def preprocess_data(qap, tc):
     return qap_df, tc_df
 
 
-@weave.op()
+# @weave.op()
 def analyze_distribution(qap_df):
     passage_id_counts = Counter()
     for ids in qap_df["relevant_passage_ids"]:
@@ -51,7 +52,7 @@ def analyze_distribution(qap_df):
     return passage_id_counts
 
 
-@weave.op()
+# @weave.op()
 def get_freq_bin(count, bins=[1, 2, 3, 4, 5, float("inf")]):
     for i in range(len(bins) - 1):
         if bins[i] <= count < bins[i + 1]:
@@ -59,7 +60,7 @@ def get_freq_bin(count, bins=[1, 2, 3, 4, 5, float("inf")]):
     return f"{bins[-1]}+"
 
 
-@weave.op()
+# @weave.op()
 def select_passage_ids(passage_id_counts, sample_frac=0.015, random_state=42):
     passage_id_df = pd.DataFrame(
         {
@@ -77,12 +78,12 @@ def select_passage_ids(passage_id_counts, sample_frac=0.015, random_state=42):
     return passage_id_df.iloc[selected_indices]["id"].tolist()
 
 
-@weave.op()
+# @weave.op()
 def filter_passage_ids(ids, selected_passage_ids):
     return [id for id in ids if id in selected_passage_ids]
 
 
-@weave.op()
+# @weave.op()
 def filter_qap_df(qap_df, selected_passage_ids):
     qap_df_filtered = qap_df.copy(deep=True)
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -98,7 +99,7 @@ def filter_qap_df(qap_df, selected_passage_ids):
     return qap_df_filtered
 
 
-@weave.op()
+# @weave.op()
 def create_weave_dataset(df, name):
     return weave.Dataset(name=name, rows=df.to_dict(orient="records"))
 
